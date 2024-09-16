@@ -28,76 +28,102 @@ Este proyecto implementa una estructura de datos de grafo en C++ con funcionalid
 4. **Data**: 
    - String simple: $O(1)$ para operaciones básicas.
 
-Eficiencia general:
-- Acceso a nodos: $O(1)$ promedio
-- Inserción de nodos: $O(1)$ amortizado
-- Búsqueda de nodos: $O(1)$ promedio, $O(n)$ peor caso
-- Manejo de aristas: $O(1)$ promedio, $O(n)$ peor caso
-
 ## Algoritmos Implementados
 
 ### Búsqueda en Anchura (BFS)
 
-Complejidad: $O(|V| + |E|)$, donde $|V|$ es el número de vértices y $|E|$ el número de aristas.
+BFS explora el grafo nivel por nivel, visitando primero todos los vecinos directos de un nodo antes de pasar al siguiente nivel.
 
 Pseudocódigo:
 ```
 función BFS(G, s):
-    para cada vértice u ∈ V[G] - {s}:
-        color[u] = BLANCO
-        d[u] = ∞
-        π[u] = NIL
-    color[s] = GRIS
-    d[s] = 0
-    π[s] = NIL
-    Q = ∅
+    para cada vértice u en V[G] - {s}:
+        estado[u] = NO_VISITADO
+        distancia[u] = infinito
+        padre[u] = NULO
+    estado[s] = VISITADO
+    distancia[s] = 0
+    padre[s] = NULO
+    Q = nueva Cola()
     ENCOLAR(Q, s)
-    mientras Q ≠ ∅:
+    mientras NO_ESTA_VACIA(Q):
         u = DESENCOLAR(Q)
-        para cada v ∈ Adj[u]:
-            si color[v] = BLANCO:
-                color[v] = GRIS
-                d[v] = d[u] + 1
-                π[v] = u
+        para cada v en ADY[u]:
+            si estado[v] == NO_VISITADO:
+                estado[v] = VISITADO
+                distancia[v] = distancia[u] + 1
+                padre[v] = u
                 ENCOLAR(Q, v)
-        color[u] = NEGRO
+    return distancia, padre
 ```
+
+Explicación:
+- Inicializamos todos los nodos como no visitados, con distancia infinita y sin padre.
+- Comenzamos desde el nodo inicial 's', marcándolo como visitado, con distancia 0 y sin padre.
+- Usamos una cola para procesar los nodos en el orden correcto (primero en entrar, primero en salir).
+- Para cada nodo en la cola, exploramos todos sus vecinos no visitados.
+- Marcamos los vecinos como visitados, actualizamos su distancia y padre, y los añadimos a la cola.
+- El proceso continúa hasta que la cola esté vacía, lo que significa que hemos explorado todo el grafo alcanzable desde 's'.
+
+Complejidad: $O(|V| + |E|)$, donde $|V|$ es el número de vértices y $|E|$ el número de aristas.
 
 ### Algoritmo de Dijkstra
 
-Complejidad: $O((|V| + |E|) \log |V|)$ con cola de prioridad.
+Dijkstra encuentra la ruta más corta entre dos nodos en un grafo con pesos positivos.
 
 Pseudocódigo:
 ```
-función Dijkstra(G, w, s):
-    INICIALIZAR-FUENTE-ÚNICA(G, s)
-    S = ∅
-    Q = V[G]
-    mientras Q ≠ ∅:
-        u = EXTRAER-MÍNIMO(Q)
-        S = S ∪ {u}
-        para cada vértice v ∈ Adj[u]:
-            RELAJACIÓN(u, v, w)
+función Dijkstra(G, origen, destino):
+    para cada vértice v en V[G]:
+        distancia[v] = infinito
+        padre[v] = NULO
+    distancia[origen] = 0
+    Q = nueva ColaPrioridad()
+    INSERTAR(Q, (0, origen))
+    mientras NO_ESTA_VACIA(Q):
+        (dist, u) = EXTRAER_MINIMO(Q)
+        si u == destino:
+            break
+        para cada v en ADY[u]:
+            nueva_dist = distancia[u] + peso(u, v)
+            si nueva_dist < distancia[v]:
+                distancia[v] = nueva_dist
+                padre[v] = u
+                INSERTAR(Q, (nueva_dist, v))
+    return reconstruir_camino(padre, origen, destino), distancia[destino]
 ```
+
+Explicación:
+- Inicializamos todas las distancias como infinito y los padres como NULO.
+- La distancia al nodo origen se establece en 0.
+- Usamos una cola de prioridad para seleccionar siempre el nodo más cercano no procesado.
+- En cada iteración, seleccionamos el nodo con la menor distancia de la cola.
+- Si alcanzamos el destino, terminamos la búsqueda.
+- Para cada vecino del nodo actual, calculamos la nueva distancia pasando por este nodo.
+- Si encontramos un camino más corto, actualizamos la distancia y el padre del vecino.
+- Añadimos el vecino a la cola de prioridad con su nueva distancia.
+- Al final, reconstruimos el camino más corto usando los padres y devolvemos la distancia total.
+
+Complejidad: $O((|V| + |E|) \log |V|)$ con cola de prioridad, donde $|V|$ es el número de vértices y $|E|$ el número de aristas.
 
 ## Compilación y Ejecución
 
-Compilar:
+Para compilar el proyecto:
 ```
 make
 ```
 
-Ejecutar ejemplo simple:
+Para ejecutar el ejemplo simple:
 ```
 make run
 ```
 
-Ejecutar ejemplo de ciudades europeas:
+Para ejecutar el ejemplo de ciudades europeas:
 ```
 make run2
 ```
 
-Limpiar archivos compilados:
+Para limpiar los archivos compilados:
 ```
 make clean
 ```
